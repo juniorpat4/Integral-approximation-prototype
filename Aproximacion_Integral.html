@@ -1,0 +1,606 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Aproximación Integral</title>
+<meta name="description" content="Guía interactiva sobre aproximación de la integral definida con el método del trapecio y la regla de Simpson">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+  :root{
+    --bg:#EEF3F2;
+    --surface:#FFFFFF;
+    --surface-2:#E3ECEA;
+    --ink:#16232E;
+    --body:#45545E;
+    --muted:#6E7D86;
+    --accent:#1F6F78;
+    --accent-ink:#0E4247;
+    --accent-2:#C97C2E;
+    --success:#287A54;
+    --danger:#B8433F;
+    --grid-line:rgba(22,35,46,0.07);
+    --card-border:rgba(22,35,46,0.10);
+    --shadow:0 1px 2px rgba(16,30,38,0.06), 0 8px 24px -12px rgba(16,30,38,0.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0E1618;
+      --surface:#152023;
+      --surface-2:#1B282B;
+      --ink:#E7EEEF;
+      --body:#AFC0C5;
+      --muted:#83959B;
+      --accent:#54BDB4;
+      --accent-ink:#BFEDE8;
+      --accent-2:#E3A75C;
+      --success:#63C795;
+      --danger:#E28380;
+      --grid-line:rgba(231,238,239,0.07);
+      --card-border:rgba(231,238,239,0.12);
+      --shadow:0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0E1618;
+    --surface:#152023;
+    --surface-2:#1B282B;
+    --ink:#E7EEEF;
+    --body:#AFC0C5;
+    --muted:#83959B;
+    --accent:#54BDB4;
+    --accent-ink:#BFEDE8;
+    --accent-2:#E3A75C;
+    --success:#63C795;
+    --danger:#E28380;
+    --grid-line:rgba(231,238,239,0.07);
+    --card-border:rgba(231,238,239,0.12);
+    --shadow:0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:
+      linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0/40px 40px,
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0/40px 40px,
+      var(--bg);
+    color:var(--body);
+    font-family:'IBM Plex Sans', Arial, sans-serif;
+    font-size:16px;
+    line-height:1.55;
+    padding-inline:20px;
+  }
+  h1,h2,h3{font-family:'EB Garamond', Georgia, serif; color:var(--ink); font-weight:600; text-wrap:balance}
+  .mono{font-family:'JetBrains Mono', 'Courier New', monospace}
+  a{color:var(--accent)}
+
+  .wrap{max-width:920px;margin:0 auto}
+  .wrap-wide{max-width:1180px;margin:0 auto}
+
+  /* ---------- Nav ---------- */
+  .topbar{
+    position:sticky; top:env(safe-area-inset-top,0px); z-index:50;
+    background:color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--card-border);
+    margin-inline:-20px; padding-inline:20px;
+  }
+  .topbar-inner{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:18px;padding-block:12px;flex-wrap:wrap}
+  .brand{font-family:'EB Garamond',serif;font-weight:600;color:var(--ink);font-size:19px;white-space:nowrap}
+  .brand span{color:var(--accent)}
+  .navlinks{display:flex;gap:4px;overflow-x:auto;flex:1;scrollbar-width:none}
+  .navlinks::-webkit-scrollbar{display:none}
+  .navlinks a{
+    white-space:nowrap;font-size:13.5px;font-weight:500;color:var(--muted);
+    text-decoration:none;padding:7px 12px;border-radius:100px;transition:background .15s,color .15s;
+  }
+  .navlinks a:hover{background:var(--surface-2);color:var(--ink)}
+
+  /* ---------- Hero ---------- */
+  .hero{max-width:920px;margin:0 auto;padding-block:64px 40px}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--accent-ink); background:color-mix(in srgb, var(--accent) 14%, transparent);
+    display:inline-block;padding:5px 12px;border-radius:100px;margin-bottom:20px;
+  }
+  .hero h1{font-size:clamp(34px,6vw,54px);line-height:1.08;margin:0 0 16px}
+  .hero p.lead{font-size:18px;max-width:62ch;margin:0 0 6px}
+  .hero .cred{font-size:14px;color:var(--muted);margin-top:18px}
+
+  /* ---------- Sections ---------- */
+  section.page{max-width:920px;margin:0 auto;padding-block:56px;border-top:1px solid var(--card-border)}
+  section.page:first-of-type{border-top:none}
+  .tag{
+    display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:12.5px;
+    color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px;
+  }
+  .tag b{color:var(--accent)}
+  section.page h2{font-size:clamp(26px,4vw,32px);margin:0 0 18px}
+  section.page p{margin:0 0 16px;max-width:70ch}
+  .callout{
+    background:var(--surface);border:1px solid var(--card-border);border-radius:14px;
+    padding:18px 22px;box-shadow:var(--shadow);margin-block:20px;
+  }
+  .callout.formula{text-align:center;font-family:'JetBrains Mono',monospace;font-size:17px;color:var(--ink)}
+  .formula b{color:var(--accent-ink)}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+  @media (max-width:680px){.two-col{grid-template-columns:1fr}}
+
+  /* ---------- Demo (rectangles/trapezoids) ---------- */
+  .demo{background:var(--surface);border:1px solid var(--card-border);border-radius:16px;padding:22px;box-shadow:var(--shadow)}
+  .demo svg{width:100%;height:auto;display:block}
+  .demo-controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+  .mode-btn{
+    font-family:'IBM Plex Sans';font-size:13.5px;font-weight:600;padding:7px 14px;border-radius:100px;
+    border:1px solid var(--card-border);background:var(--surface-2);color:var(--body);cursor:pointer;
+  }
+  .mode-btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+  .slider-row{display:flex;align-items:center;gap:10px;flex:1;min-width:180px}
+  .slider-row input[type=range]{flex:1;accent-color:var(--accent)}
+  .demo-readout{display:flex;gap:22px;flex-wrap:wrap;margin-top:14px;font-family:'JetBrains Mono',monospace;font-size:14px}
+  .demo-readout div span{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+  .demo-readout .approx{color:var(--accent-ink);font-weight:700}
+  .demo-readout .err{color:var(--danger);font-weight:700}
+
+  /* ---------- Spreadsheet table ---------- */
+  .sheet-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--card-border);box-shadow:var(--shadow)}
+  table.sheet{border-collapse:collapse;width:100%;min-width:640px;font-family:'JetBrains Mono',monospace;font-size:12.5px}
+  table.sheet th,table.sheet td{border:1px solid var(--card-border);padding:8px 10px;text-align:center;white-space:nowrap}
+  table.sheet thead th{background:var(--surface-2);color:var(--ink);font-weight:700}
+  table.sheet td.rowhead{background:var(--surface-2);color:var(--muted);font-weight:700}
+  table.sheet td{background:var(--surface);color:var(--body)}
+  table.sheet td.hdr{background:color-mix(in srgb, var(--accent) 12%, var(--surface));color:var(--accent-ink);font-weight:700}
+
+  /* ---------- Exercise cards ---------- */
+  .ex-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  @media (max-width:760px){.ex-grid{grid-template-columns:1fr}}
+  .ex-card{
+    background:var(--surface);border:1px solid var(--card-border);border-radius:16px;padding:22px;
+    box-shadow:var(--shadow);display:flex;flex-direction:column;gap:14px;
+  }
+  .ex-tag{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent-ink);font-weight:700}
+  .ex-formula{font-family:'JetBrains Mono',monospace;font-size:19px;color:var(--ink);font-weight:500}
+  .ex-note{font-size:13.5px;color:var(--muted);margin:0}
+  .ex-buttons{display:flex;gap:8px;flex-wrap:wrap}
+  .ex-btn{
+    font-family:'IBM Plex Sans';font-size:13px;font-weight:600;padding:8px 14px;border-radius:9px;
+    border:1px solid var(--card-border);background:var(--surface-2);color:var(--ink);cursor:pointer;transition:transform .1s;
+  }
+  .ex-btn:hover{transform:translateY(-1px)}
+  .ex-btn.trap{border-color:color-mix(in srgb, var(--accent) 55%, var(--card-border))}
+  .ex-btn.simp{border-color:color-mix(in srgb, var(--accent-2) 55%, var(--card-border))}
+  .ex-btn.err{border-color:color-mix(in srgb, var(--danger) 45%, var(--card-border))}
+  .ex-btn.active.trap{background:var(--accent);color:#fff}
+  .ex-btn.active.simp{background:var(--accent-2);color:#1a1206}
+  .ex-btn.active.err{background:var(--danger);color:#fff}
+  .ex-result{
+    font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--surface-2);
+    border-radius:10px;padding:14px 16px;color:var(--body);
+  }
+  .ex-result table{width:100%;border-collapse:collapse}
+  .ex-result td{padding:3px 6px;white-space:nowrap}
+  .ex-result td.k{color:var(--muted)}
+  .ex-result td.v{text-align:right;color:var(--ink);font-weight:600}
+  .ex-result .note{margin-top:10px;font-family:'IBM Plex Sans';font-size:13px;color:var(--body)}
+  .badge-better{display:inline-block;background:color-mix(in srgb, var(--success) 18%, transparent);color:var(--success);border-radius:6px;padding:1px 7px;font-size:11.5px;font-weight:700;margin-left:6px}
+
+  footer{max-width:920px;margin:0 auto;padding-block:40px 60px;color:var(--muted);font-size:13px;border-top:1px solid var(--card-border)}
+</style>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">∫ <span>Aproximación</span> a la Integral</div>
+    <nav class="navlinks">
+      <a href="#idea">1 · La idea</a>
+      <a href="#trapecio">2 · Trapecio</a>
+      <a href="#excel">3 · Hoja Excel</a>
+      <a href="#simpson">4 · Simpson</a>
+      <a href="#error">5 · Error</a>
+      <a href="#ejercicios">6 · Ejercicios</a>
+    </nav>
+  </div>
+</div>
+
+<div class="hero">
+  <span class="eyebrow">Universidad de Cartagena · Cálculo Integral · Ingeniería de Sistemas</span>
+  <h1>Aproximación a la integral definida</h1>
+  <p class="lead">Construimos, paso a paso, la idea detrás de la hoja de cálculo de Excel que aproxima el área bajo una curva: primero con rectángulos, luego con trapecios y finalmente comparándolo con la regla de Simpson.</p>
+  <p class="cred">Basado en la guía de práctica «Aproximación a la integral definida» — Facultad de Ciencias Exactas y Naturales.</p>
+</div>
+
+<section class="page" id="idea">
+  <span class="tag">Página <b>1</b> — El concepto</span>
+  <h2>Sumar áreas pequeñas para estimar una grande</h2>
+  <p>Para aproximar <span class="mono">∫ₐᵇ f(x) dx</span> dividimos el intervalo <span class="mono">[a,b]</span> en 50 partes iguales, cada una de amplitud <span class="mono">h = (b−a)/50</span>. Cada subintervalo de la partición es un pequeño <span class="mono">[aᵢ, bᵢ]</span>, y sobre él levantamos un rectángulo cuya altura es <span class="mono">f(aᵢ)</span> (extremo izquierdo) o <span class="mono">f(bᵢ)</span> (extremo derecho).</p>
+  <div class="callout formula">Σ h·f(aᵢ) &nbsp;≈&nbsp; ∫ₐᵇ f(x) dx &nbsp;≈&nbsp; Σ h·f(bᵢ)</div>
+  <p>Si <span class="mono">f</span> es monótona, el valor real de la integral queda <b style="color:var(--ink)">atrapado entre las dos sumas</b> — la de la izquierda y la de la derecha. Mueve el control para ver cómo cambia la aproximación según el número de particiones y el tipo de rectángulo.</p>
+
+  <div class="demo">
+    <svg id="demoSvg" viewBox="0 0 640 320" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Gráfica de f(x)=0.35x^2+1 con rectángulos de aproximación"></svg>
+    <div class="demo-controls">
+      <button class="mode-btn" data-mode="izq" aria-pressed="true">Rect. izquierda</button>
+      <button class="mode-btn" data-mode="der" aria-pressed="false">Rect. derecha</button>
+      <button class="mode-btn" data-mode="trap" aria-pressed="false">Trapecios</button>
+      <div class="slider-row">
+        <label for="nSlider" style="font-size:13px;color:var(--muted);white-space:nowrap">n = <span id="nVal">6</span></label>
+        <input type="range" id="nSlider" min="2" max="24" value="6" step="1">
+      </div>
+    </div>
+    <div class="demo-readout">
+      <div><span>Función</span><span class="mono">f(x) = 0.35x² + 1</span></div>
+      <div><span>Aproximación</span><span class="approx" id="demoApprox">—</span></div>
+      <div><span>Valor exacto</span><span class="mono" id="demoExact">31.200000</span></div>
+      <div><span>Error absoluto</span><span class="err" id="demoErr">—</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="trapecio">
+  <span class="tag">Página <b>1–2</b> — Del rectángulo al trapecio</span>
+  <h2>Método del trapecio</h2>
+  <p>Podemos mejorar la aproximación aumentando el número de divisiones, o sustituyendo cada rectángulo por un <b style="color:var(--ink)">trapecio</b> cuyos lados paralelos son <span class="mono">f(aᵢ)</span> y <span class="mono">f(bᵢ)</span>, los valores de la función en los dos extremos de cada subintervalo. El área de cada trapecio es el promedio de ambas alturas multiplicado por la base:</p>
+  <div class="callout formula">Áreaᵢ = h · (f(aᵢ) + f(bᵢ)) / 2</div>
+  <p>Sumando los 50 trapecios y agrupando los términos que se repiten (cada punto interior aporta dos veces, una como extremo derecho de un trapecio y otra como extremo izquierdo del siguiente) llegamos a la forma convencional de la regla del trapecio compuesta, la misma que arma la columna <span class="mono">G</span> de la hoja de Excel:</p>
+  <div class="callout formula">T = (Δx / 2) · [ f(a) + f(b) + 2·Σ f(xᵢ) ]&nbsp;, &nbsp;i = 1 … n−1</div>
+  <p style="margin-top:-6px">donde <span class="mono">Δx = h = (b−a)/n</span>, <span class="mono">a</span> y <span class="mono">b</span> son los extremos de todo el intervalo, y la sumatoria recorre únicamente los <span class="mono">n−1</span> puntos interiores de la partición.</p>
+  <p>Como el trapecio sigue la pendiente real de la curva entre dos puntos, su error es menor que el de cualquiera de los dos rectángulos por separado.</p>
+</section>
+
+<section class="page" id="excel">
+  <span class="tag">Página <b>2–4</b> — Construcción en Excel</span>
+  <h2>La hoja de cálculo</h2>
+  <p>La guía original construye la hoja con <span class="mono">a</span> y <span class="mono">b</span> en B2 y B3, el incremento <span class="mono">h=(B3-B2)/50</span> en B4, y rellena 50 filas (6 a 56) con estas fórmulas:</p>
+  <div class="sheet-wrap">
+    <table class="sheet">
+      <thead><tr><td></td><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th></tr></thead>
+      <tbody>
+        <tr><td class="rowhead">1</td><td class="hdr" colspan="2">INTEGRAL DEFINIDA</td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td class="rowhead">2</td><td>a</td><td></td><td></td><td>Int.def.izq</td><td></td><td></td><td></td></tr>
+        <tr><td class="rowhead">3</td><td>b</td><td></td><td></td><td>Int.def.dch</td><td></td><td></td><td></td></tr>
+        <tr><td class="rowhead">4</td><td>h</td><td class="hdr">=(B3-B2)/50</td><td>Trapecios</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td class="rowhead">5</td><td>x</td><td>f(xi)</td><td>f(xd)</td><td>(f(xi)+f(xd))/2</td><td>h·f(xi)</td><td>h·f(xd)</td><td>h·f(xm)</td></tr>
+        <tr><td class="rowhead">6</td><td class="hdr">=B2</td><td>=x^2+3</td><td>=B7</td><td>=(B6+C6)/2</td><td>=B6*B$4</td><td>=C6*B$4</td><td>=D6*B$4</td></tr>
+        <tr><td class="rowhead">7</td><td class="hdr">=A6+B$4</td><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="margin-top:16px">Puntos clave de la construcción:</p>
+  <ul style="margin:0 0 16px;padding-left:20px">
+    <li>El signo <span class="mono">$</span> en <span class="mono">B$4</span> fija la fila del incremento al «rellenar hacia abajo».</li>
+    <li>La celda A6 recibe el nombre <span class="mono">x</span> (Insertar → Nombre → Definir, <span class="mono">=$A6</span>) para escribir <span class="mono">f(x)</span> en notación natural, p. ej. <span class="mono">=x^2+3</span>.</li>
+    <li>Los resultados finales se obtienen sumando cada columna: <span class="mono">=SUMA(E6:E55)</span>, <span class="mono">=SUMA(F6:F55)</span>, <span class="mono">=SUMA(G6:G55)</span>.</li>
+  </ul>
+</section>
+
+<section class="page" id="simpson">
+  <span class="tag">Complemento</span>
+  <h2>Regla de Simpson</h2>
+  <p>Mientras el trapecio une cada par de puntos con una <b style="color:var(--ink)">recta</b>, Simpson ajusta una <b style="color:var(--ink)">parábola</b> a cada tres puntos consecutivos, siguiendo mejor la curvatura de <span class="mono">f</span>. Se necesita un número par de subintervalos <span class="mono">n</span> y amplitud <span class="mono">h=(b-a)/n</span>:</p>
+  <div class="callout formula">S = h/3 · [ f(x₀)+f(xₙ) &nbsp;+&nbsp; 4·Σ f(xᵢ), i impar &nbsp;+&nbsp; 2·Σ f(xᵢ), i par ]</div>
+  <div class="two-col">
+    <div>
+      <h3 style="font-size:18px;margin:0 0 8px">Trapecio</h3>
+      <p style="margin:0">Ajusta rectas. Error del orden de <span class="mono">h²</span>: exacto para polinomios de grado ≤ 1.</p>
+    </div>
+    <div>
+      <h3 style="font-size:18px;margin:0 0 8px">Simpson</h3>
+      <p style="margin:0">Ajusta parábolas. Error del orden de <span class="mono">h⁴</span>: exacto para polinomios de grado ≤ 3.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="error">
+  <span class="tag">Página <b>7</b> — Regla de Barrow y error</span>
+  <h2>¿Qué tan cerca estamos?</h2>
+  <p>Cuando existe una primitiva sencilla <span class="mono">F(x)</span> de <span class="mono">f(x)</span>, la regla de Barrow da el valor exacto: <span class="mono">∫ₐᵇ f(x)dx = F(b) − F(a)</span>. Comparando ese valor exacto con las aproximaciones podemos medir el error de cada método:</p>
+  <div class="callout formula">Error absoluto = |Valor exacto − Aproximación| &nbsp;·&nbsp; Error relativo = Error absoluto / |Valor exacto|</div>
+  <p>Como Simpson sigue la curvatura de <span class="mono">f</span> en vez de una línea recta, su error suele ser varios órdenes de magnitud menor que el del trapecio para la misma cantidad de puntos — lo veremos en cada ejercicio con <span class="mono">n = 50</span> subintervalos.</p>
+</section>
+
+<section class="page" id="ejercicios">
+  <span class="tag">Página <b>4–5</b> — Prácticas</span>
+  <h2>Ejercicios propuestos</h2>
+  <p>Las integrales que propone la guía original, aproximadas con <span class="mono">n = 50</span>. Pulsa cada botón para calcular en el momento: <b style="color:var(--accent-ink)">Trapecio</b>, <b style="color:var(--accent-2)">Simpson</b> o <b style="color:var(--danger)">Errores</b> (compara ambos métodos frente al valor exacto).</p>
+
+  <div class="ex-grid" id="exGrid"></div>
+</section>
+
+<footer class="wrap">
+  Guía interactiva construida a partir de «Aproximación a la integral definida» — Facultad de Ciencias Exactas y Naturales, Universidad de Cartagena. Todos los cálculos se ejecutan en el navegador con n = 50 subintervalos.
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- numerical engine ---------------- */
+  function trapezoid(f,a,b,n){
+    const h=(b-a)/n; let s=0.5*(f(a)+f(b));
+    for(let i=1;i<n;i++) s+=f(a+i*h);
+    return s*h;
+  }
+  function simpson(f,a,b,n){
+    if(n%2!==0) n++;
+    const h=(b-a)/n; let s=f(a)+f(b);
+    for(let i=1;i<n;i++) s += f(a+i*h) * (i%2===0?2:4);
+    return s*h/3;
+  }
+  function fmt(x,d){
+    if(!isFinite(x)) return "—";
+    d = d===undefined?6:d;
+    return x.toFixed(d);
+  }
+
+  /* ---------------- section 1 demo ---------------- */
+  const svg = document.getElementById('demoSvg');
+  const nSlider = document.getElementById('nSlider');
+  const nVal = document.getElementById('nVal');
+  const demoApprox = document.getElementById('demoApprox');
+  const demoErr = document.getElementById('demoErr');
+  const modeBtns = document.querySelectorAll('.mode-btn');
+  let demoMode = 'izq';
+
+  const DA=0, DB=6;
+  const df = x => 0.35*x*x+1;
+  const dexact = 0.35*216/3 + 6; // 31.2
+
+  const PAD_L=54, PAD_R=20, PAD_T=20, PAD_B=40, W=640, H=320;
+  const plotW = W-PAD_L-PAD_R, plotH = H-PAD_T-PAD_B;
+  const yMax = 14;
+  function px(x){ return PAD_L + (x-DA)/(DB-DA)*plotW; }
+  function py(y){ return PAD_T + (1-(y/yMax))*plotH; }
+
+  function ns(tag){ return document.createElementNS('http://www.w3.org/2000/svg', tag); }
+
+  function drawDemo(){
+    svg.innerHTML='';
+    const cssInk = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim();
+    const cssBody = getComputedStyle(document.documentElement).getPropertyValue('--body').trim();
+    const cssAccent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+    const cssAccent2 = getComputedStyle(document.documentElement).getPropertyValue('--accent-2').trim();
+    const cssGrid = getComputedStyle(document.documentElement).getPropertyValue('--grid-line').trim();
+
+    // axes
+    const axisG = ns('g');
+    for(let gy=0; gy<=yMax; gy+=2){
+      const line = ns('line');
+      line.setAttribute('x1',PAD_L); line.setAttribute('x2',W-PAD_R);
+      line.setAttribute('y1',py(gy)); line.setAttribute('y2',py(gy));
+      line.setAttribute('stroke',cssGrid); line.setAttribute('stroke-width','1');
+      axisG.appendChild(line);
+    }
+    const xAxis = ns('line');
+    xAxis.setAttribute('x1',PAD_L); xAxis.setAttribute('x2',W-PAD_R);
+    xAxis.setAttribute('y1',py(0)); xAxis.setAttribute('y2',py(0));
+    xAxis.setAttribute('stroke',cssBody); xAxis.setAttribute('stroke-width','1.5');
+    axisG.appendChild(xAxis);
+    const yAxis = ns('line');
+    yAxis.setAttribute('x1',PAD_L); yAxis.setAttribute('x2',PAD_L);
+    yAxis.setAttribute('y1',PAD_T); yAxis.setAttribute('y2',H-PAD_B);
+    yAxis.setAttribute('stroke',cssBody); yAxis.setAttribute('stroke-width','1.5');
+    axisG.appendChild(yAxis);
+    for(let gx=0; gx<=DB; gx++){
+      const t = ns('text');
+      t.setAttribute('x',px(gx)); t.setAttribute('y',H-PAD_B+18);
+      t.setAttribute('font-size','11'); t.setAttribute('fill',cssBody); t.setAttribute('text-anchor','middle');
+      t.textContent=gx; axisG.appendChild(t);
+    }
+    svg.appendChild(axisG);
+
+    const n = parseInt(nSlider.value,10);
+    const h = (DB-DA)/n;
+
+    // bars / trapezoids
+    const barsG = ns('g');
+    for(let i=0;i<n;i++){
+      const x0 = DA+i*h, x1 = DA+(i+1)*h;
+      let poly;
+      if(demoMode==='trap'){
+        const pts = [ [px(x0),py(0)], [px(x0),py(df(x0))], [px(x1),py(df(x1))], [px(x1),py(0)] ];
+        poly = ns('polygon');
+        poly.setAttribute('points', pts.map(p=>p.join(',')).join(' '));
+      } else {
+        const height = demoMode==='izq' ? df(x0) : df(x1);
+        poly = ns('rect');
+        poly.setAttribute('x',px(x0)); poly.setAttribute('y',py(height));
+        poly.setAttribute('width', px(x1)-px(x0)); poly.setAttribute('height', py(0)-py(height));
+      }
+      poly.setAttribute('fill', demoMode==='trap'? cssAccent2 : cssAccent);
+      poly.setAttribute('fill-opacity','0.28');
+      poly.setAttribute('stroke', demoMode==='trap'? cssAccent2 : cssAccent);
+      poly.setAttribute('stroke-width','1.2');
+      barsG.appendChild(poly);
+    }
+    svg.appendChild(barsG);
+
+    // curve
+    let d='';
+    const steps=120;
+    for(let i=0;i<=steps;i++){
+      const x = DA + (DB-DA)*i/steps;
+      const cmd = i===0?'M':'L';
+      d += `${cmd}${px(x)},${py(df(x))} `;
+    }
+    const path = ns('path');
+    path.setAttribute('d', d);
+    path.setAttribute('fill','none');
+    path.setAttribute('stroke', cssInk);
+    path.setAttribute('stroke-width','2.4');
+    svg.appendChild(path);
+
+    // readouts
+    let approx;
+    if(demoMode==='izq'){
+      let s=0; for(let i=0;i<n;i++) s+=df(DA+i*h)*h; approx=s;
+    } else if(demoMode==='der'){
+      let s=0; for(let i=0;i<n;i++) s+=df(DA+(i+1)*h)*h; approx=s;
+    } else {
+      approx = trapezoid(df,DA,DB,n);
+    }
+    nVal.textContent = n;
+    demoApprox.textContent = fmt(approx);
+    demoErr.textContent = fmt(Math.abs(dexact-approx));
+  }
+
+  nSlider.addEventListener('input', drawDemo);
+  modeBtns.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      modeBtns.forEach(b=>b.setAttribute('aria-pressed','false'));
+      btn.setAttribute('aria-pressed','true');
+      demoMode = btn.dataset.mode;
+      drawDemo();
+    });
+  });
+  drawDemo();
+
+  /* ---------------- exercises ---------------- */
+  const N = 50;
+
+  const EXERCISES = [
+    {
+      id:'ex1', tag:'Ejercicio 1', formula:'∫₀⁴ 3x dx',
+      note:'Área de un triángulo de base 4 y altura 12.',
+      parts:[{f:x=>3*x, a:0, b:4}], exact:24
+    },
+    {
+      id:'ex2', tag:'Ejercicio 2', formula:'∫₁⁴ 3x dx',
+      note:'Área del trapecio entre x=1 y x=4.',
+      parts:[{f:x=>3*x, a:1, b:4}], exact:22.5
+    },
+    {
+      id:'ex3', tag:'Ejercicio 3', formula:'∫₋₂⁴ 3x dx',
+      note:'Relación: igual a [−2,0] + [0,4] = −6 + 24 = 18.',
+      parts:[{f:x=>3*x, a:-2, b:4}], exact:18
+    },
+    {
+      id:'ex4', tag:'Ejercicio 4', formula:'∫₋₂⁰ 3x dx',
+      note:'Área con signo negativo: la recta está bajo el eje X.',
+      parts:[{f:x=>3*x, a:-2, b:0}], exact:-6
+    },
+    {
+      id:'ex5', tag:'Ejercicio 5', formula:'∫₋₃³ (x² − 9) dx',
+      note:'Resultado negativo: f(x) es mayormente negativa en [−3,3].',
+      parts:[{f:x=>x*x-9, a:-3, b:3}], exact:-36
+    },
+    {
+      id:'ex6', tag:'Ejercicio 6', formula:'∫₀³ √(9 − x²) dx',
+      note:'Cuarta parte del área de un círculo de radio 3: 9π/4.',
+      parts:[{f:x=>Math.sqrt(Math.max(0,9-x*x)), a:0, b:3}], exact:9*Math.PI/4
+    },
+    {
+      id:'ex7', tag:'Ejercicio 7', formula:'∫₀³ 4√(1 − x²/9) dx',
+      note:'Cuarta parte del área de una elipse de semiejes 3 y 4: 3π.',
+      parts:[{f:x=>4*Math.sqrt(Math.max(0,1-x*x/9)), a:0, b:3}], exact:3*Math.PI
+    },
+    {
+      id:'ex8', tag:'Ejercicio 8', formula:'∫₀^π sin(x) dx',
+      note:'Área bajo un arco completo de seno.',
+      parts:[{f:x=>Math.sin(x), a:0, b:Math.PI}], exact:2
+    },
+    {
+      id:'ex9', tag:'Ejercicio 9', formula:'∫₁⁴ [(x² − 7) − (5x − 3)] dx',
+      note:'Área entre f(x)=x²−7 y g(x)=5x−3. El signo indica que g está por encima de f en el intervalo.',
+      parts:[{f:x=>(x*x-7)-(5*x-3), a:1, b:4}], exact:-28.5
+    },
+    {
+      id:'ex10', tag:'Ejercicio 10', formula:'∫₀¹ (x² − x³) dx',
+      note:'Área encerrada entre f(x)=x² y g(x)=x³ en [0,1].',
+      parts:[{f:x=>x*x-x*x*x, a:0, b:1}], exact:1/12
+    },
+    {
+      id:'ex11', tag:'Ejercicio 11', formula:'|∫₋₃⁰ f| + |∫₀¹ f| + |∫₁² f|,  f(x)=x(x+3)(x−1)(x−2)',
+      note:'Área total encerrada entre la curva y el eje OX, sumando cada tramo en valor absoluto.',
+      parts:[
+        {f:x=>x*(x+3)*(x-1)*(x-2), a:-3, b:0},
+        {f:x=>x*(x+3)*(x-1)*(x-2), a:0, b:1},
+        {f:x=>x*(x+3)*(x-1)*(x-2), a:1, b:2}
+      ],
+      useAbs:true,
+      exact:43.4
+    }
+  ];
+
+  function computeTrap(ex){
+    let total=0;
+    ex.parts.forEach(p=>{
+      let v = trapezoid(p.f,p.a,p.b,N);
+      total += ex.useAbs ? Math.abs(v) : v;
+    });
+    return total;
+  }
+  function computeSimp(ex){
+    let total=0;
+    ex.parts.forEach(p=>{
+      let v = simpson(p.f,p.a,p.b,N);
+      total += ex.useAbs ? Math.abs(v) : v;
+    });
+    return total;
+  }
+
+  function renderResult(ex, method){
+    const trap = computeTrap(ex);
+    const simp = computeSimp(ex);
+    const exact = ex.exact;
+
+    if(method==='trap' || method==='simp'){
+      const val = method==='trap'?trap:simp;
+      const err = Math.abs(exact-val);
+      const rel = exact!==0 ? (err/Math.abs(exact)*100) : 0;
+      return `<table>
+        <tr><td class="k">Método</td><td class="v">${method==='trap'?'Trapecio compuesto':'Simpson compuesto'}</td></tr>
+        <tr><td class="k">n</td><td class="v">${ex.parts.length>1? N+' × '+ex.parts.length+' tramos' : N}</td></tr>
+        <tr><td class="k">Aproximación</td><td class="v">${fmt(val)}</td></tr>
+        <tr><td class="k">Valor exacto</td><td class="v">${fmt(exact)}</td></tr>
+        <tr><td class="k">Error absoluto</td><td class="v">${fmt(err)}</td></tr>
+        <tr><td class="k">Error relativo</td><td class="v">${fmt(rel,4)}%</td></tr>
+      </table>`;
+    }
+
+    // errors comparison
+    const errT = Math.abs(exact-trap);
+    const errS = Math.abs(exact-simp);
+    const better = errS<=errT ? 'Simpson' : 'Trapecio';
+    return `<table>
+      <tr><td class="k">Valor exacto</td><td class="v">${fmt(exact)}</td></tr>
+      <tr><td class="k">Trapecio (n=${N})</td><td class="v">${fmt(trap)}</td></tr>
+      <tr><td class="k">Error trapecio</td><td class="v">${fmt(errT)}</td></tr>
+      <tr><td class="k">Simpson (n=${N})</td><td class="v">${fmt(simp)}</td></tr>
+      <tr><td class="k">Error Simpson</td><td class="v">${fmt(errS)}</td></tr>
+    </table>
+    <p class="note">${ex.note} <span class="badge-better">${better} más preciso</span></p>`;
+  }
+
+  const grid = document.getElementById('exGrid');
+  EXERCISES.forEach(ex=>{
+    const card = document.createElement('article');
+    card.className='ex-card';
+    card.innerHTML = `
+      <div>
+        <div class="ex-tag">${ex.tag}</div>
+        <div class="ex-formula">${ex.formula}</div>
+        <p class="ex-note">${ex.note}</p>
+      </div>
+      <div class="ex-buttons">
+        <button class="ex-btn trap" data-method="trap">Trapecio</button>
+        <button class="ex-btn simp" data-method="simp">Simpson</button>
+        <button class="ex-btn err" data-method="err">Errores</button>
+      </div>
+      <div class="ex-result" hidden></div>
+    `;
+    const resultBox = card.querySelector('.ex-result');
+    const buttons = card.querySelectorAll('.ex-btn');
+    buttons.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const isActive = btn.classList.contains('active');
+        buttons.forEach(b=>b.classList.remove('active'));
+        if(isActive){
+          resultBox.hidden = true;
+          return;
+        }
+        btn.classList.add('active');
+        resultBox.innerHTML = renderResult(ex, btn.dataset.method);
+        resultBox.hidden = false;
+      });
+    });
+    grid.appendChild(card);
+  });
+})();
+</script>
+
+</body></html>

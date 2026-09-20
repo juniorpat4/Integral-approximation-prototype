@@ -1,0 +1,14 @@
+{
+  "expresion_str": "cos(x)",
+  "expresion_cpp": "cos(x)",
+  "variable": "x",
+  "es_definida": true,
+  "a": -3.1415,
+  "b": 3.1415,
+  "n": 20,
+  "h": 0.31415000000000004,
+  "f2_cpp": "-cos(x)",
+  "f4_cpp": "cos(x)",
+  "max_abs_f2": 0.9999999957076562,
+  "max_abs_f4": 0.9999999957076562
+}
